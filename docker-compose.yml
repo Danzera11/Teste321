@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  app:
+    build: ./app
+    ports:
+      - '5173:80'
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:3000/api
+
+  backend:
+    build: ./backend
+    command: ["node", "src/server.js"]
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://portal:CHANGE_ME_POSTGRES_PASSWORD@db:5432/nitro_portal?schema=public
+      - PORT=3000
+      - JWT_SECRET=CHANGE_ME_LONG_RANDOM_JWT_SECRET
+
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: portal
+      POSTGRES_PASSWORD: portal
+      POSTGRES_DB: nitro_portal
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  pgdata:
