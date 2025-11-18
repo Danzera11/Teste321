@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id            String        @id @default(cuid())
+  name          String
+  domain        String
+  segment       String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deployments   Deployment[]
+}
+
+model Analyst {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("analyst")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  logs      DecisionLog[]
+}
+
+model Deployment {
+  id             String        @id @default(cuid())
+  client         Client        @relation(fields: [clientId], references: [id])
+  clientId       String
+  modelSelected  String
+  licensing      String
+  status         String        @default("planejamento")
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  decisions      DecisionLog[]
+}
+
+model DecisionLog {
+  id            String   @id @default(cuid())
+  analyst       Analyst  @relation(fields: [analystId], references: [id])
+  analystId     String
+  deployment    Deployment @relation(fields: [deploymentId], references: [id])
+  deploymentId  String
+  description   String
+  createdAt     DateTime @default(now())
+}
