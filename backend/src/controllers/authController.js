@@ -24,7 +24,10 @@ export async function login(req, res, next) {
       return res.status(401).json({ message: 'Credenciais inválidas' });
     }
 
-    const token = jwt.sign({ sub: analyst.id, role: analyst.role }, process.env.JWT_SECRET || 'CHANGE_ME_LONG_RANDOM_JWT_SECRET', {
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is required');
+    }
+    const token = jwt.sign({ sub: analyst.id, role: analyst.role }, process.env.JWT_SECRET, {
       expiresIn: '2h'
     });
 

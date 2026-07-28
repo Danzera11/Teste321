@@ -6,7 +6,10 @@ export function requireAuth(req, res, next) {
 
   const [, token] = header.split(' ');
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'CHANGE_ME_LONG_RANDOM_JWT_SECRET');
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is required');
+    }
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
     req.user = payload;
     return next();
   } catch (error) {
